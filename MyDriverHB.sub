@@ -1,0 +1,25 @@
+* My HB driver with dead time
+* Adjust dead time using time constant tau
+* (C) Marcos Alonso, 2021
+.subckt MyDriverHB IN SD -DRB +DRB -DRA +DRA GND
+C1 x1 IN {tau/1000}
+R2 x1 0 1k
+R3 1V x2 1k
+C2 x2 IN {tau/1000}
+A1 0 1V 0 x1 0 0 p1 0 AND
+A2 0 1V 0 x2 0 p2 0 0 AND
+V4 1V 0 1
+A3 0 p1 0 p2 0 N004 shots 0 OR
+A4 N001 0 shots N002 N005 N001 A 0 DFLOP
+A5 N006 0 N004 N002 N005 N006 B 0 DFLOP
+A6 0 A N003 B 0 0 out_a 0 AND
+A7 0 A SD B 0 out_b 0 0 OR
+E1 +DRA -DRA out_a 0 {Vcc}
+E2 +DRB -DRB out_b 0 {Vcc}
+A8 SD 0 0 0 0 N003 0 0 BUF
+V1 init 0 PULSE(0 1 0 {tau/10} {tau/10} {5*tau})
+A9 0 N007 0 init 0 0 N005 0 AND
+A10 0 IN 0 init 0 0 N002 0 AND
+A11 IN 0 0 0 0 N007 0 0 BUF
+Rdum GND 0 10meg
+.ends MyDriver
